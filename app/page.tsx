@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import jsPDF from "jspdf";
 
 const premiumTable: Record<string, number> = {
@@ -40,7 +40,6 @@ export default function Home() {
 
     doc.setFontSize(12);
     let y = 40;
-
     const rows = [
       ["Full Name", form.fullName],
       ["Email", form.email],
@@ -63,18 +62,26 @@ export default function Home() {
     doc.save("Atlantic-Insurance-Quote.pdf");
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "12px",
+    border: "1px solid #d1d5db",
+    borderRadius: "8px",
+    boxSizing: "border-box",
+  };
+
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8">
-        <h1 className="text-4xl font-bold text-blue-900 mb-2">
+    <main style={{ maxWidth: 1000, margin: "40px auto", padding: 20 }}>
+      <div style={{ background: "white", padding: 32, borderRadius: 16, boxShadow: "0 10px 25px rgba(0,0,0,0.08)" }}>
+        <h1 style={{ color: "#0b3a78", fontSize: 40, marginBottom: 8 }}>
           Atlantic Insurance
         </h1>
-        <p className="text-gray-600 mb-8">
+        <p style={{ color: "#6b7280", marginBottom: 32 }}>
           Buy your vehicle insurance online.
         </p>
 
-        <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <h2>Personal Information</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
           {[
             ["fullName", "Full Name"],
             ["email", "Email"],
@@ -84,15 +91,15 @@ export default function Home() {
             <input
               key={field}
               placeholder={label}
-              className="border rounded-lg p-3"
+              style={inputStyle}
               value={(form as any)[field]}
               onChange={(e) => updateField(field, e.target.value)}
             />
           ))}
         </div>
 
-        <h2 className="text-2xl font-semibold mb-4">Vehicle Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <h2>Vehicle Information</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
           {[
             ["make", "Make"],
             ["model", "Model"],
@@ -104,24 +111,24 @@ export default function Home() {
             <input
               key={field}
               placeholder={label}
-              className="border rounded-lg p-3"
+              style={inputStyle}
               value={(form as any)[field]}
               onChange={(e) => updateField(field, e.target.value)}
             />
           ))}
 
           <select
-            className="border rounded-lg p-3"
+            style={inputStyle}
             value={form.cylinders}
             onChange={(e) => updateField("cylinders", e.target.value)}
           >
-            <option>4</option>
-            <option>6</option>
-            <option>8</option>
+            <option value="4">4 Cylinders</option>
+            <option value="6">6 Cylinders</option>
+            <option value="8">8 Cylinders</option>
           </select>
 
           <select
-            className="border rounded-lg p-3"
+            style={inputStyle}
             value={form.coveragePeriod}
             onChange={(e) => updateField("coveragePeriod", e.target.value)}
           >
@@ -132,19 +139,24 @@ export default function Home() {
           </select>
         </div>
 
-        <div className="bg-blue-50 p-6 rounded-xl mb-6">
-          <h3 className="text-xl font-semibold text-blue-900 mb-2">
-            Premium Summary
-          </h3>
-          <p className="text-3xl font-bold text-green-700">
+        <div style={{ background: "#eff6ff", padding: 24, borderRadius: 12, marginBottom: 24 }}>
+          <h3 style={{ marginTop: 0, color: "#0b3a78" }}>Premium Summary</h3>
+          <p style={{ fontSize: 36, fontWeight: "bold", color: "#15803d", margin: 0 }}>
             BZD {premium.toFixed(2)}
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-4">
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <button
             onClick={generatePDF}
-            className="bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-blue-800"
+            style={{
+              background: "#0b3a78",
+              color: "white",
+              padding: "12px 24px",
+              border: "none",
+              borderRadius: 8,
+              cursor: "pointer",
+            }}
           >
             Generate PDF
           </button>
@@ -153,7 +165,13 @@ export default function Home() {
             href="https://example.com/payment"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+            style={{
+              background: "#16a34a",
+              color: "white",
+              padding: "12px 24px",
+              borderRadius: 8,
+              textDecoration: "none",
+            }}
           >
             Proceed to Payment
           </a>
