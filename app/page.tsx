@@ -1,6 +1,5 @@
 
 "use client";
-
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 
@@ -12,169 +11,162 @@ const premiumTable: Record<string, number> = {
 };
 
 export default function Home() {
+  const [started, setStarted] = useState(false);
   const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    make: "",
-    model: "",
-    year: "",
-    registration: "",
-    engineNo: "",
-    chassisNo: "",
-    cylinders: "4",
-    coveragePeriod: "3 Months",
+    fullName: "", email: "", phone: "", make: "", model: "",
+    registration: "", cylinders: "4 Cylinders", coveragePeriod: "3 Months"
   });
 
   const premium = premiumTable[form.coveragePeriod] || 0;
+  const step = started ? 3 : 0;
 
-  const updateField = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+  const update = (field: string, value: string) =>
+    setForm(prev => ({...prev, [field]: value}));
 
   const generatePDF = () => {
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Atlantic Insurance - Motor Insurance Quote", 20, 20);
-
-    doc.setFontSize(12);
-    let y = 40;
-    const rows = [
-      ["Full Name", form.fullName],
-      ["Email", form.email],
-      ["Phone", form.phone],
-      ["Address", form.address],
-      ["Vehicle", `${form.year} ${form.make} ${form.model}`],
-      ["Registration", form.registration],
-      ["Engine No.", form.engineNo],
-      ["Chassis No.", form.chassisNo],
-      ["Cylinders", form.cylinders],
-      ["Coverage Period", form.coveragePeriod],
-      ["Premium", `BZD ${premium.toFixed(2)}`],
-    ];
-
-    rows.forEach(([label, value]) => {
-      doc.text(`${label}: ${value}`, 20, y);
-      y += 8;
+    doc.setFontSize(22);
+    doc.text("Atlantic Insurance", 20, 20);
+    doc.setFontSize(14);
+    doc.text("Motor Insurance Quote", 20, 30);
+    let y = 50;
+    Object.entries({
+      "Customer": form.fullName,
+      "Email": form.email,
+      "Phone": form.phone,
+      "Vehicle": `${form.make} ${form.model}`,
+      "Registration": form.registration,
+      "Coverage": form.coveragePeriod,
+      "Premium": `BZD ${premium.toFixed(2)}`
+    }).forEach(([k,v]) => {
+      doc.text(`${k}: ${v}`, 20, y);
+      y += 10;
     });
-
     doc.save("Atlantic-Insurance-Quote.pdf");
   };
 
-  const inputStyle: React.CSSProperties = {
+  const card = {
+    background: "white",
+    borderRadius: 24,
+    boxShadow: "0 20px 60px rgba(15,23,42,0.08)",
+    padding: 40
+  } as React.CSSProperties;
+
+  const input = {
     width: "100%",
-    padding: "12px",
-    border: "1px solid #d1d5db",
-    borderRadius: "8px",
+    padding: "14px 16px",
+    borderRadius: 12,
+    border: "1px solid #dbe2ea",
     boxSizing: "border-box",
-  };
+    fontSize: 16
+  } as React.CSSProperties;
+
+  if (!started) {
+    return (
+      <main>
+        <section style={{
+          background: "linear-gradient(135deg,#143d8d,#1f6ed4)",
+          color: "white", padding: "80px 20px"
+        }}>
+          <div style={{maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 40}}>
+            <div>
+              <div style={{fontSize: 18, opacity: .9, marginBottom: 12}}>ATLANTIC INSURANCE</div>
+              <h1 style={{fontSize: 56, lineHeight: 1.1, margin: "0 0 20px 0"}}>
+                Buy Your Vehicle Insurance Online in Minutes
+              </h1>
+              <p style={{fontSize: 20, opacity: .9, maxWidth: 600}}>
+                Complete your quote, generate your policy documents, and proceed to payment in a few simple steps.
+              </p>
+              <button onClick={() => setStarted(true)} style={{
+                marginTop: 30, background: "#22c55e", color: "white",
+                border: "none", borderRadius: 12, padding: "16px 28px",
+                fontSize: 18, cursor: "pointer", fontWeight: 600
+              }}>
+                Get Started
+              </button>
+            </div>
+            <div style={card}>
+              <h3 style={{marginTop:0, color:"#143d8d"}}>Private Use Rates</h3>
+              {Object.entries(premiumTable).map(([k,v]) => (
+                <div key={k} style={{display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #eef2f7"}}>
+                  <span>{k}</span><strong>BZD {v.toFixed(2)}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
-    <main style={{ maxWidth: 1000, margin: "40px auto", padding: 20 }}>
-      <div style={{ background: "white", padding: 32, borderRadius: 16, boxShadow: "0 10px 25px rgba(0,0,0,0.08)" }}>
-        <h1 style={{ color: "#0b3a78", fontSize: 40, marginBottom: 8 }}>
-          Atlantic Insurance
-        </h1>
-        <p style={{ color: "#6b7280", marginBottom: 32 }}>
-          Buy your vehicle insurance online.
-        </p>
+    <main style={{maxWidth: 1100, margin: "40px auto", padding: 20}}>
+      <div style={{marginBottom: 20}}>
+        <div style={{fontSize: 14, color: "#64748b"}}>Step {step} of 3</div>
+        <div style={{height: 8, background:"#e2e8f0", borderRadius: 99, marginTop: 8}}>
+          <div style={{width: "100%", height: "100%", background:"#22c55e", borderRadius: 99}} />
+        </div>
+      </div>
 
-        <h2>Personal Information</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
-          {[
-            ["fullName", "Full Name"],
-            ["email", "Email"],
-            ["phone", "Phone Number"],
-            ["address", "Address"],
-          ].map(([field, label]) => (
-            <input
-              key={field}
-              placeholder={label}
-              style={inputStyle}
-              value={(form as any)[field]}
-              onChange={(e) => updateField(field, e.target.value)}
-            />
-          ))}
+      <div style={{display: "grid", gridTemplateColumns: "2fr 1fr", gap: 30}}>
+        <div style={card}>
+          <h2 style={{marginTop:0, color:"#143d8d"}}>Vehicle Insurance Application</h2>
+          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:16}}>
+            {[
+              ["fullName","Full Name"],
+              ["email","Email Address"],
+              ["phone","Phone Number"],
+              ["registration","Registration Number"],
+              ["make","Vehicle Make"],
+              ["model","Vehicle Model"],
+            ].map(([field,label]) => (
+              <input key={field} placeholder={label} style={input}
+                value={(form as any)[field]}
+                onChange={(e)=>update(field,e.target.value)} />
+            ))}
+            <select style={input} value={form.cylinders}
+              onChange={(e)=>update("cylinders",e.target.value)}>
+              <option>4 Cylinders</option>
+              <option>6 Cylinders</option>
+              <option>8 Cylinders</option>
+            </select>
+            <select style={input} value={form.coveragePeriod}
+              onChange={(e)=>update("coveragePeriod",e.target.value)}>
+              <option>3 Months</option>
+              <option>6 Months</option>
+              <option>9 Months</option>
+              <option>12 Months</option>
+            </select>
+          </div>
         </div>
 
-        <h2>Vehicle Information</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
-          {[
-            ["make", "Make"],
-            ["model", "Model"],
-            ["year", "Year"],
-            ["registration", "Registration Number"],
-            ["engineNo", "Engine Number"],
-            ["chassisNo", "Chassis Number"],
-          ].map(([field, label]) => (
-            <input
-              key={field}
-              placeholder={label}
-              style={inputStyle}
-              value={(form as any)[field]}
-              onChange={(e) => updateField(field, e.target.value)}
-            />
-          ))}
-
-          <select
-            style={inputStyle}
-            value={form.cylinders}
-            onChange={(e) => updateField("cylinders", e.target.value)}
-          >
-            <option value="4">4 Cylinders</option>
-            <option value="6">6 Cylinders</option>
-            <option value="8">8 Cylinders</option>
-          </select>
-
-          <select
-            style={inputStyle}
-            value={form.coveragePeriod}
-            onChange={(e) => updateField("coveragePeriod", e.target.value)}
-          >
-            <option>3 Months</option>
-            <option>6 Months</option>
-            <option>9 Months</option>
-            <option>12 Months</option>
-          </select>
-        </div>
-
-        <div style={{ background: "#eff6ff", padding: 24, borderRadius: 12, marginBottom: 24 }}>
-          <h3 style={{ marginTop: 0, color: "#0b3a78" }}>Premium Summary</h3>
-          <p style={{ fontSize: 36, fontWeight: "bold", color: "#15803d", margin: 0 }}>
+        <div style={card}>
+          <h3 style={{marginTop:0, color:"#143d8d"}}>Premium Summary</h3>
+          <div style={{fontSize: 14, color:"#64748b"}}>{form.coveragePeriod}</div>
+          <div style={{fontSize: 42, fontWeight: 700, color:"#16a34a", margin:"10px 0 20px"}}>
             BZD {premium.toFixed(2)}
-          </p>
-        </div>
-
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <button
-            onClick={generatePDF}
-            style={{
-              background: "#0b3a78",
-              color: "white",
-              padding: "12px 24px",
-              border: "none",
-              borderRadius: 8,
-              cursor: "pointer",
-            }}
-          >
-            Generate PDF
+          </div>
+          <button onClick={generatePDF} style={{
+            width:"100%", background:"#143d8d", color:"white",
+            border:"none", borderRadius:12, padding:"14px", cursor:"pointer",
+            marginBottom:12, fontSize:16
+          }}>
+            Download Quote PDF
           </button>
-
-          <a
-            href="https://example.com/payment"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              background: "#16a34a",
-              color: "white",
-              padding: "12px 24px",
-              borderRadius: 8,
-              textDecoration: "none",
-            }}
-          >
+          <a href="https://example.com/payment" target="_blank" rel="noreferrer"
+             style={{
+               display:"block", textAlign:"center", background:"#22c55e",
+               color:"white", padding:"14px", borderRadius:12,
+               textDecoration:"none", fontWeight:600
+             }}>
             Proceed to Payment
           </a>
+          <div style={{
+            marginTop:20, padding:16, background:"#f8fafc",
+            borderRadius:12, fontSize:14, color:"#475569"
+          }}>
+            📱 Scan QR code or click the payment button to complete your purchase.
+          </div>
         </div>
       </div>
     </main>
