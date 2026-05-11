@@ -1,9 +1,6 @@
-
-import React from "react";
-
 export const metadata = {
   title: "Atlantic Insurance Online",
-  description: "Motor Insurance Application"
+  description: "Motor Insurance Prototype"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
