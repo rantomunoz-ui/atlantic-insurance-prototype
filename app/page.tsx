@@ -4,11 +4,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
-const premiumTable: Record<string, number> = {
-  "3 Months": 150,
-  "6 Months": 300,
-  "9 Months": 200,
-  "12 Months": 350,
+const premiumTable: Record<string, Record<string, number>> = {
+  "4": { "3 Months": 200, "6 Months": 450, "9 Months": 300, "12 Months": 500 },
+  "6": { "3 Months": 210, "6 Months": 460, "9 Months": 310, "12 Months": 520 },
+  "8": { "3 Months": 220, "6 Months": 470, "9 Months": 320, "12 Months": 540 },
 };
 
 const inputStyle: React.CSSProperties = {
@@ -19,23 +18,27 @@ const inputStyle: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
-function Field({ label, placeholder = "" }: { label: string; placeholder?: string }) {
+function Field({
+  label,
+  type = "text",
+}: {
+  label: string;
+  type?: string;
+}) {
   return (
     <div>
       <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{label}</label>
-      <input placeholder={placeholder} style={inputStyle} />
+      <input type={type} style={inputStyle} />
     </div>
   );
 }
 
 export default function Home() {
   const [step, setStep] = useState(1);
+  const [cylinders, setCylinders] = useState("4");
   const [coverage, setCoverage] = useState("3 Months");
 
-  const premium = premiumTable[coverage];
-
-  const next = () => setStep((s) => Math.min(s + 1, 3));
-  const back = () => setStep((s) => Math.max(s - 1, 1));
+  const premium = premiumTable[cylinders][coverage];
 
   return (
     <main>
@@ -45,8 +48,13 @@ export default function Home() {
         padding: "24px 0 60px"
       }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-          <Image src="/logo.png" alt="Atlantic Insurance" width={280} height={70}
-            style={{ background: "white", padding: 10, borderRadius: 12 }} />
+          <Image
+            src="/logo.png"
+            alt="Atlantic Insurance"
+            width={420}
+            height={110}
+            style={{ background: "white", padding: 14, borderRadius: 14 }}
+          />
           <h1 style={{ fontSize: 48, marginTop: 40, marginBottom: 10 }}>
             Buy Your Motor Insurance Online
           </h1>
@@ -63,8 +71,8 @@ export default function Home() {
           boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
           padding: 32
         }}>
-          <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-            {["1. Applicant Information", "2. Vehicle Information", "3. Documents & Premium"].map((label, i) => (
+          <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
+            {["1. Applicant Information", "2. Vehicle Information", "3. Documents, Premium & Payment"].map((label, i) => (
               <div key={label}
                 style={{
                   padding: "10px 14px",
@@ -86,9 +94,13 @@ export default function Home() {
                 <Field label="First Name" />
                 <Field label="Middle Name" />
                 <Field label="Surname" />
-                <Field label="Social Security Number" />
-                <Field label="Passport Number" />
-                <Field label="Date of Birth" />
+              </div>
+              <div style={{ marginTop: 16 }}>
+                <Field label="Company Name (Optional for Businesses)" />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 16 }}>
+                <Field label="Social Security No. / Passport No." />
+                <Field label="Date of Birth" type="date" />
                 <Field label="Nationality" />
                 <Field label="Source of Income" />
                 <Field label="Occupation" />
@@ -106,12 +118,26 @@ export default function Home() {
             <>
               <h2 style={{ color: "#0b2f6b" }}>Particulars of Vehicle Insured</h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-                <Field label="Make & Model of Vehicle" />
+                <Field label="Make" />
+                <Field label="Model" />
                 <Field label="Year Manufactured" />
                 <Field label="Type" />
                 <Field label="Registry No. or VIN" />
                 <Field label="Capacity" />
-                <Field label="Cylinders" />
+
+                <div>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Cylinders</label>
+                  <select
+                    value={cylinders}
+                    onChange={(e) => setCylinders(e.target.value)}
+                    style={inputStyle}
+                  >
+                    <option value="4">4 Cylinders</option>
+                    <option value="6">6 Cylinders</option>
+                    <option value="8">8 Cylinders</option>
+                  </select>
+                </div>
+
                 <Field label="Color" />
                 <Field label="License Plate Number" />
                 <Field label="Present Value" />
@@ -121,24 +147,23 @@ export default function Home() {
 
           {step === 3 && (
             <>
-              <h2 style={{ color: "#0b2f6b" }}>Documents & Premium</h2>
+              <h2 style={{ color: "#0b2f6b" }}>Documents, Premium & Payment</h2>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
-                <div>
-                  <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Social Security Card</label>
-                  <input type="file" style={inputStyle} />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Passport</label>
-                  <input type="file" style={inputStyle} />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Vehicle Title</label>
-                  <input type="file" style={inputStyle} />
-                </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16, marginBottom: 24 }}>
+                {[
+                  "Driver's License",
+                  "Vehicle Title",
+                  "Social Security Card / Passport",
+                  "Utility Bill",
+                ].map((label) => (
+                  <div key={label}>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{label}</label>
+                    <input type="file" style={inputStyle} />
+                  </div>
+                ))}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24, marginBottom: 24 }}>
                 <div>
                   <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Coverage Period</label>
                   <select
@@ -165,12 +190,57 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+                <div style={{
+                  border: "2px dashed #cbd5e1",
+                  borderRadius: 12,
+                  padding: 30,
+                  textAlign: "center",
+                  color: "#64748b"
+                }}>
+                  QR Code Placeholder
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <a href="https://example.com/payment" target="_blank" rel="noreferrer"
+                    style={{
+                      background: "#22c55e",
+                      color: "white",
+                      textDecoration: "none",
+                      padding: "14px 18px",
+                      borderRadius: 8,
+                      textAlign: "center",
+                      fontWeight: 700
+                    }}>
+                    Proceed to Payment
+                  </a>
+
+                  {[
+                    "Client Data Form",
+                    "Proposal Form",
+                    "Policy Schedule",
+                    "Certificate of Insurance",
+                  ].map((doc) => (
+                    <button key={doc}
+                      style={{
+                        padding: "12px 16px",
+                        borderRadius: 8,
+                        border: "1px solid #cbd5e1",
+                        background: "white",
+                        cursor: "pointer"
+                      }}>
+                      Print {doc}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </>
           )}
 
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 32 }}>
             <button
-              onClick={back}
+              onClick={() => setStep((s) => Math.max(1, s - 1))}
               disabled={step === 1}
               style={{
                 padding: "12px 24px",
@@ -184,7 +254,7 @@ export default function Home() {
             </button>
 
             <button
-              onClick={next}
+              onClick={() => setStep((s) => Math.min(3, s + 1))}
               style={{
                 padding: "12px 24px",
                 borderRadius: 8,
